@@ -1,15 +1,22 @@
 import java.sql.*;
 import java.util.Scanner;
 
+import java.io.File;
+import java.io.IOException;
+
 public class SqliteDemo {
 
     public static Connection con = null;
     public static int maxId = 0;
+    
+    
+    
 
     public static void connect() {
+    	String dir = System.getProperty("user.dir") + "\\notes.db";
         try {
             if(con == null){
-                String url = "jdbc:sqlite:C:\\Users\\Phedri\\Documents\\code_2019\\languages\\java_language\\java\\sqlite-java\\src\\notes.db";
+                String url = "jdbc:sqlite:"+dir;
                 con = DriverManager.getConnection(url);
                 System.out.println("===> Connection to SQLite has been established successfully.");
             }
@@ -18,6 +25,33 @@ public class SqliteDemo {
         }
     }
 
+    public static void createFile() throws IOException {
+    	// let's create the db file, and the database inside
+    	String dir = System.getProperty("user.dir") + "\\notes.db";
+    	
+    	String path = dir;
+    	File file = new File(path);
+    	if (file.createNewFile()) {
+    		System.out.println(path +" File Created");
+    	} else {
+    		System.out.println("File " + path + " already exists");
+    	}
+    }
+    
+    public static void createTable() {
+    	try {
+    		connect();
+    		Statement state = con.createStatement();
+    		String sql = "CREATE TABLE Notes(id int primary key, title text not null, date text not null)";
+    		state.execute(sql);
+    		System.out.println("Table has been created successfully.");
+    		close();
+    	} catch (SQLException ex) {
+    		System.out.println(ex.getMessage());
+    	}
+    }
+    
+    
     public static void close() {
         try {
             if (con != null) {
@@ -128,13 +162,19 @@ public class SqliteDemo {
     }
     
 
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) throws SQLException, IOException {
+    	createFile();
+    	createTable();
+    	
         Scanner input = new Scanner(System.in);
         String title;
         String date;
         int id;
         int choice;
         boolean running = true;
+        
+        
+        
 
         System.out.println("======== NOTE KEEPER alpha ======");
         System.out.println("Welcome to note keeper , a program to store your notes created by Amine and Imane Elmouradi!");
